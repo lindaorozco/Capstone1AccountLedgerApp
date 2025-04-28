@@ -12,7 +12,7 @@ public class Transaction {
     double amount;
 
     // Creating a constructor this activates after add a deposit, make payment, read transactions
-    public Transaction (LocalDate date, LocalTime time, String description, String idOfTransaction, String vendor, double amount){
+    public Transaction (LocalDate date, LocalTime time, String description, String vendor,String idOfTransaction,double amount){
         this.date = date;
         this.time = time;
         this.description = description;

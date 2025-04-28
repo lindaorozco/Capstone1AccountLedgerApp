@@ -50,7 +50,7 @@ public class AccountLedgerApp {
         while (homeMenuRunning) {
             // Ask the user what they'd like to do/ Give prompts
             System.out.println(""" 
-                    \n------------  What would you like to do today? ------------\n
+                    \n------------  What would you like to do today? ------------
                     D. Add Deposit
                     P. Make Payment
                     L. Display Ledger Screen
@@ -71,7 +71,8 @@ public class AccountLedgerApp {
                     writeToFile(transactionFileName, newPayment);
                     break;
                 case "L":
-
+                    ledgerMenu();
+                    break;
                 case "X":
                     homeMenuRunning = false; //case running = false to get the program to stop running
                     break;
@@ -172,7 +173,7 @@ public class AccountLedgerApp {
             // 'P' Payments will show all payments
 
             System.out.println(""" 
-                     \n ------------  Please select from the following options:  ------------\n
+                     \n ------------  Please select from the following options:  ------------
                     A. Display all entries
                     D. Deposits
                     P. Payments
@@ -186,8 +187,14 @@ public class AccountLedgerApp {
             // Create switch statement to allow user to make a choice
             switch (userInputLedger) {
                 case "A":
-                    List<Transaction> transactions = getTransactionsFromFile(transactionFileName);
-                    displayTransaction(transactions);
+                    List<Transaction> allTransactions = getTransactionsFromFile(transactionFileName);
+                    displayTransaction(allTransactions);
+                    break;
+                case "D":
+                    List<Transaction> depositTransactions = searchTransactionById("D");
+                    displayTransaction(depositTransactions);
+                    break;
+                case "R":
                     break;
                 case "H":
                     ledgerMenuRunning = false;
@@ -195,7 +202,6 @@ public class AccountLedgerApp {
 
 
             }
-
 
         }
 
@@ -209,7 +215,6 @@ public class AccountLedgerApp {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] arrayTransactions = line.split("\\|");
-
 
                 Transaction transaction = new Transaction(LocalDate.parse(arrayTransactions[0], dateFormatter), LocalTime.parse(arrayTransactions[1], timeFormatter), arrayTransactions[2], arrayTransactions[3], arrayTransactions[4], Double.parseDouble(arrayTransactions[5]));
 
@@ -231,22 +236,22 @@ public class AccountLedgerApp {
         }
     }
     // Showing all deposits
-    public static List<Transaction> displayDeposits (){
+    public static List<Transaction> searchTransactionById (String id){
         System.out.println(" \n ------------  Showing all deposits:  ------------\n");
 
         // List contains all transactions
         List<Transaction> transactions = getTransactionsFromFile(transactionFileName);
 
         // This is the empty list where I will store all deposit transactions
-        List<Transaction> depositTransactions = new ArrayList<>();
+        List<Transaction> matchingIdTransactions = new ArrayList<>();
 
         // for each loop where it will enter into csv file and sort out 'D' transactions into a new list
         for (Transaction transaction: transactions){
-            if (transaction.getIdOfTransaction().equals("D")) {
-                depositTransactions.add(transaction);
+            if (transaction.getIdOfTransaction().equals(id)) {
+                matchingIdTransactions.add(transaction);
             }
         }
-        return depositTransactions;
+        return matchingIdTransactions;
 
     }
 }
