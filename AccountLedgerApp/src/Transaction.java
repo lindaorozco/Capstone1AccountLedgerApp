@@ -3,7 +3,7 @@ import java.time.LocalTime;
 
 public class Transaction {
 
-    // create variables for transaction class. This class activates after the user chooses to add a deposit.
+    // create variables for transaction class.
     LocalDate date;
     LocalTime time;
     String description;
@@ -11,7 +11,7 @@ public class Transaction {
     String vendor;
     double amount;
 
-    // Creating a constructor and add in all the variables I created
+    // Creating a constructor this activates after add a deposit, make payment, read transactions
     public Transaction (LocalDate date, LocalTime time, String description, String idOfTransaction, String vendor, double amount){
         this.date = date;
         this.time = time;
@@ -21,7 +21,7 @@ public class Transaction {
         this.amount = amount;
 
     }
-    // toString() grabs user input and formats
+    // toString() grabs user input and formats into a string and saves to csv
     @Override
     public String toString() {
         return date.format(AccountLedgerApp.dateFormatter) + "|" + time.format(AccountLedgerApp.timeFormatter) + "|" + description + "|" + vendor + "|" + idOfTransaction + "|" + amount;

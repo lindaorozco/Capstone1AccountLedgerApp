@@ -14,7 +14,7 @@ public class AccountLedgerApp {
 
     // Import Scanner in the class using static
     static Scanner scanner = new Scanner(System.in);
-    static String transactionFileName = "src/transaction.csv"; // inputting here so it can be accessible
+    static String transactionFileName = "src/transaction.csv"; // Name of csv file where are transactions
     static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
     static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -128,7 +128,7 @@ public class AccountLedgerApp {
         LocalTime lt = LocalTime.now();
 
         System.out.println("Please enter the payment amount: ");
-        double amount = Double.parseDouble(scanner.nextLine());
+        double amount = (Double.parseDouble(scanner.nextLine()))* -1 ; //-1 to negate the amount of the payment.
 
         System.out.println("Please enter the vendor name: ");
         String vendor = scanner.nextLine().trim();
@@ -168,6 +168,8 @@ public class AccountLedgerApp {
         /* Create while loop to repeat a block of code until the condition is met */
         while (ledgerMenuRunning) {
             // Ask the user which option they'd like to pick
+            // D 'Deposits' show all deposits
+            // 'P' Payments will show all payments
 
             System.out.println(""" 
                      \n ------------  Please select from the following options:  ------------\n
@@ -228,7 +230,25 @@ public class AccountLedgerApp {
 
         }
     }
+    // Showing all deposits
+    public static List<Transaction> displayDeposits (){
+        System.out.println(" \n ------------  Showing all deposits:  ------------\n");
 
+        // List contains all transactions
+        List<Transaction> transactions = getTransactionsFromFile(transactionFileName);
+
+        // This is the empty list where I will store all deposit transactions
+        List<Transaction> depositTransactions = new ArrayList<>();
+
+        // for each loop where it will enter into csv file and sort out 'D' transactions into a new list
+        for (Transaction transaction: transactions){
+            if (transaction.getIdOfTransaction().equals("D")) {
+                depositTransactions.add(transaction);
+            }
+        }
+        return depositTransactions;
+
+    }
 }
 
 
