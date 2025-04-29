@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Transaction {
@@ -10,9 +11,12 @@ public class Transaction {
     String idOfTransaction;
     String vendor;
     double amount;
+    LocalDateTime dateTime;
+
 
     // Creating a constructor this activates after add a deposit, make payment, read transactions
     public Transaction (LocalDate date, LocalTime time, String description, String vendor,String idOfTransaction,double amount){
+        this.dateTime = LocalDateTime.of(date,time);
         this.date = date;
         this.time = time;
         this.description = description;
@@ -28,6 +32,15 @@ public class Transaction {
     }
 
     // Create getters and setters
+
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
 
     public String getIdOfTransaction() {
         return idOfTransaction;

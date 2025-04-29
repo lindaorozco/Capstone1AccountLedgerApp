@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ public class AccountLedgerApp {
     public static void main(String[] args) {
 
         homeMenu();
-        ledgerMenu();
 
 
     }
@@ -191,14 +191,21 @@ public class AccountLedgerApp {
                     displayTransaction(allTransactions);
                     break;
                 case "D":
-                    List<Transaction> depositTransactions = searchTransactionById("D");
+                    List<Transaction> depositTransactions = searchTransactionById("D", "Deposits");
                     displayTransaction(depositTransactions);
                     break;
+                case "P":
+                    List<Transaction> paymentTransactions = searchTransactionById("P", "Payments");
+                    displayTransaction(paymentTransactions);
+                    break;
                 case "R":
+                    reportMenu();
                     break;
                 case "H":
                     ledgerMenuRunning = false;
                     break;
+                default:
+                    System.out.println("Invalid entry. Please select from the following options: 'D','P','R','H' ");
 
 
             }
@@ -236,8 +243,8 @@ public class AccountLedgerApp {
         }
     }
     // Showing all deposits
-    public static List<Transaction> searchTransactionById (String id){
-        System.out.println(" \n ------------  Showing all deposits:  ------------\n");
+    public static List<Transaction> searchTransactionById (String id, String transactionTypeName){
+        System.out.println(" \n ------------  Showing all " + transactionTypeName + ":  ------------\n");
 
         // List contains all transactions
         List<Transaction> transactions = getTransactionsFromFile(transactionFileName);
@@ -254,7 +261,84 @@ public class AccountLedgerApp {
         return matchingIdTransactions;
 
     }
+    public static void reportMenu() {
+        System.out.println("\n                     *****   Showing All Reports: *****      ");
+        System.out.println(""" 
+                 \n ------------  Please select from the following options:  ------------
+                1. Month To Date
+                2. Previous Month
+                3. Year To Date
+                4. Previous Year
+                5. Search by Vendor
+                0. Back
+                """);
+        int userChoice = Integer.parseInt(scanner.nextLine());
+
+        //create switch statement
+        switch (userChoice){
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                List<Transaction> yearToDateTransactions = yearToDate(transactionFileName);
+                displayTransaction(yearToDateTransactions);
+                break;
+            case 4:
+                break;
+            case 5:
+                List<Transaction> searchVendorTransaction = searchByVendor(transactionFileName);
+                displayTransaction(searchVendorTransaction);
+                break;
+            case 0:
+                break;
+        }
+
+    }
+    public static List<Transaction> searchByVendor(String fileName){
+        // all trans list
+      List<Transaction> transactions = getTransactionsFromFile(fileName);
+        // new list containing only the matching vendor info of transactions
+      List<Transaction> matchingVendors = new ArrayList<>();
+        System.out.println("Please enter the vendors name: ");
+
+        String userVendorsName = scanner.nextLine();
+
+      for (Transaction transaction: transactions){
+          if (transaction.getVendor().equals(userVendorsName)) {
+              matchingVendors.add(transaction);
+          }
+      }
+        return matchingVendors;
+    }
+    public static List<Transaction> yearToDate(String fileName){
+        // List
+        List<Transaction> transactions = getTransactionsFromFile(fileName);
+        // Will create a new list year to date.
+        List<Transaction> yearToDate = new ArrayList<>();
+
+        // LDT to get todays date
+        LocalDateTime todayDate = LocalDateTime.now();
+        // Beginning of the year
+        LocalDateTime firstDayOfYear = todayDate.withDayOfYear(1);
+
+            for (Transaction transaction: transactions){
+                // 'dt' was created in transaction class, in trans builder by combing date & time
+                LocalDateTime dt = transaction.getDateTime();
+
+                if ((dt.isEqual(firstDayOfYear) || dt.isAfter(firstDayOfYear)) && ((dt.isEqual(todayDate) || dt.isBefore(todayDate)))) {
+                    yearToDate.add(transaction);
+
+                }
+            }
+            return yearToDate;
+
+    }
+
+
+
 }
+
 
 
 
