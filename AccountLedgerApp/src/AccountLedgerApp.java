@@ -129,7 +129,7 @@ public class AccountLedgerApp {
         LocalTime lt = LocalTime.now();
 
         System.out.println("Please enter the payment amount: ");
-        double amount = (Double.parseDouble(scanner.nextLine()))* -1 ; //-1 to negate the amount of the payment.
+        double amount = (Double.parseDouble(scanner.nextLine())) * -1; //-1 to negate the amount of the payment.
 
         System.out.println("Please enter the vendor name: ");
         String vendor = scanner.nextLine().trim();
@@ -213,7 +213,8 @@ public class AccountLedgerApp {
         }
 
     }
-    public static List<Transaction> getTransactionsFromFile (String fileName){
+
+    public static List<Transaction> getTransactionsFromFile(String fileName) {
         // Create a list to store all transactions from user entries
         List<Transaction> transactions = new ArrayList<>();
 
@@ -234,16 +235,18 @@ public class AccountLedgerApp {
         }
         return transactions;
     }
-    // Displaying a list
-    public static void displayTransaction (List<Transaction> transactions){
-        for (Transaction transaction: transactions){
+
+    // Displaying a list formatter
+    public static void displayTransaction(List<Transaction> transactions) {
+        for (Transaction transaction : transactions) {
             // printing the list in a certain format %s for strings,%.2f%$%n for two numbers after '.'
-            System.out.printf("%s | %s | %s | %s | %s | %.2f%n", transaction.getDate().format(dateFormatter), transaction.getTime().format(timeFormatter), transaction.getDescription(), transaction.getIdOfTransaction(), transaction.getVendor(),transaction.getAmount());
+            System.out.printf("%s | %s | %s | %s | %s | %.2f%n", transaction.getDate().format(dateFormatter), transaction.getTime().format(timeFormatter), transaction.getDescription(), transaction.getIdOfTransaction(), transaction.getVendor(), transaction.getAmount());
 
         }
     }
+
     // Showing all deposits
-    public static List<Transaction> searchTransactionById (String id, String transactionTypeName){
+    public static List<Transaction> searchTransactionById(String id, String transactionTypeName) {
         System.out.println(" \n ------------  Showing all " + transactionTypeName + ":  ------------\n");
 
         // List contains all transactions
@@ -253,7 +256,7 @@ public class AccountLedgerApp {
         List<Transaction> matchingIdTransactions = new ArrayList<>();
 
         // for each loop where it will enter into csv file and sort out 'D' transactions into a new list
-        for (Transaction transaction: transactions){
+        for (Transaction transaction : transactions) {
             if (transaction.getIdOfTransaction().equals(id)) {
                 matchingIdTransactions.add(transaction);
             }
@@ -261,6 +264,7 @@ public class AccountLedgerApp {
         return matchingIdTransactions;
 
     }
+
     public static void reportMenu() {
         System.out.println("\n                     *****   Showing All Reports: *****      ");
         System.out.println(""" 
@@ -275,16 +279,23 @@ public class AccountLedgerApp {
         int userChoice = Integer.parseInt(scanner.nextLine());
 
         //create switch statement
-        switch (userChoice){
+        switch (userChoice) {
             case 1:
+                List<Transaction> monthToDateTransactions = monthToDate(transactionFileName);
+                displayTransaction(monthToDateTransactions);
                 break;
             case 2:
+                List<Transaction> previousMonthTransactions = previousMonth(transactionFileName);
+                displayTransaction(previousMonthTransactions);
                 break;
             case 3:
                 List<Transaction> yearToDateTransactions = yearToDate(transactionFileName);
                 displayTransaction(yearToDateTransactions);
                 break;
             case 4:
+                List<Transaction> previousYearTransaction = previousYear(transactionFileName);
+                displayTransaction(previousYearTransaction);
+
                 break;
             case 5:
                 List<Transaction> searchVendorTransaction = searchByVendor(transactionFileName);
@@ -295,23 +306,25 @@ public class AccountLedgerApp {
         }
 
     }
-    public static List<Transaction> searchByVendor(String fileName){
+
+    public static List<Transaction> searchByVendor(String fileName) {
         // all trans list
-      List<Transaction> transactions = getTransactionsFromFile(fileName);
+        List<Transaction> transactions = getTransactionsFromFile(fileName);
         // new list containing only the matching vendor info of transactions
-      List<Transaction> matchingVendors = new ArrayList<>();
+        List<Transaction> matchingVendors = new ArrayList<>();
         System.out.println("Please enter the vendors name: ");
 
         String userVendorsName = scanner.nextLine();
 
-      for (Transaction transaction: transactions){
-          if (transaction.getVendor().equals(userVendorsName)) {
-              matchingVendors.add(transaction);
-          }
-      }
+        for (Transaction transaction : transactions) {
+            if (transaction.getVendor().equals(userVendorsName)) {
+                matchingVendors.add(transaction);
+            }
+        }
         return matchingVendors;
     }
-    public static List<Transaction> yearToDate(String fileName){
+
+    public static List<Transaction> yearToDate(String fileName) {
         // List
         List<Transaction> transactions = getTransactionsFromFile(fileName);
         // Will create a new list year to date.
@@ -322,22 +335,80 @@ public class AccountLedgerApp {
         // Beginning of the year
         LocalDateTime firstDayOfYear = todayDate.withDayOfYear(1);
 
-            for (Transaction transaction: transactions){
-                // 'dt' was created in transaction class, in trans builder by combing date & time
-                LocalDateTime dt = transaction.getDateTime();
+        for (Transaction transaction : transactions) {
+            // 'dtc' was created in transaction class, in trans builder by combing date & time
+            LocalDateTime dateTimeCombined = transaction.getDateTime();
 
-                if ((dt.isEqual(firstDayOfYear) || dt.isAfter(firstDayOfYear)) && ((dt.isEqual(todayDate) || dt.isBefore(todayDate)))) {
-                    yearToDate.add(transaction);
+            if ((dateTimeCombined.isEqual(firstDayOfYear) || dateTimeCombined.isAfter(firstDayOfYear)) && ((dateTimeCombined.isEqual(todayDate) || dateTimeCombined.isBefore(todayDate)))) {
+                yearToDate.add(transaction);
 
-                }
             }
-            return yearToDate;
+        }
+        return yearToDate;
+    }
 
+    public static List<Transaction> monthToDate(String fileName) {
+        // Old list
+        List<Transaction> transactions = getTransactionsFromFile(fileName);
+        // new list
+        List<Transaction> monthToDate = new ArrayList<>();
+
+        LocalDateTime todayDate = LocalDateTime.now();
+        LocalDateTime firstDayOfTheMonth = todayDate.withDayOfMonth(1);
+
+        // create loop
+        for (Transaction transaction : transactions) {
+
+            LocalDateTime transactionDate = transaction.getDateTime();
+
+            if ((transactionDate.isEqual(firstDayOfTheMonth)|| transactionDate.isAfter(firstDayOfTheMonth)) &&
+                   ((transactionDate.isEqual(todayDate)) || transactionDate.isBefore(todayDate))){
+
+                monthToDate.add(transaction);
+            }
+        }
+        return monthToDate;
+    }
+    public static List<Transaction> previousMonth (String fileName){
+
+        List<Transaction> transactions =getTransactionsFromFile(fileName);
+        List<Transaction> previousMonth = new ArrayList<>();
+
+        LocalDateTime currentDate = LocalDateTime.now();
+        LocalDateTime firstDayOfMonth = currentDate.withDayOfMonth(1);
+        LocalDateTime lastDayOfTheMonth = firstDayOfMonth.minusSeconds(1);
+
+        for (Transaction transaction : transactions){
+            LocalDateTime prevMonthTransaction = transaction.getDateTime();
+
+            if ((prevMonthTransaction.isEqual(firstDayOfMonth) || prevMonthTransaction.isAfter(firstDayOfMonth)) && ((prevMonthTransaction.isEqual(lastDayOfTheMonth)) || prevMonthTransaction.isBefore(lastDayOfTheMonth))){
+            }
+        }
+        return previousMonth;
+    }
+
+    public static List<Transaction> previousYear (String fileName){
+
+        List<Transaction> transactions = getTransactionsFromFile(fileName);
+        List<Transaction> previousYear = new ArrayList<>();
+
+        LocalDateTime currentDate = LocalDateTime.now();
+        LocalDateTime firstDayOfYear = currentDate.minusYears(1).withDayOfYear(1);
+        LocalDateTime lastDayOfYear = LocalDateTime.of(firstDayOfYear.getYear(),12,31,23,59,59);
+
+        for (Transaction transaction : transactions){
+
+            LocalDateTime dateTimeCombined = transaction.getDateTime();
+
+            if ((transaction.getDateTime().isEqual(firstDayOfYear) || transaction.getDateTime().isAfter(firstDayOfYear)) && (transaction.getDateTime().isEqual(lastDayOfYear)) || transaction.getDateTime().isBefore(lastDayOfYear));
+            previousYear.add(transaction);
+        }
+        return previousYear;
     }
 
 
-
 }
+
 
 
 
