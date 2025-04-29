@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -274,7 +275,7 @@ public class AccountLedgerApp {
                 3. Year To Date
                 4. Previous Year
                 5. Search by Vendor
-                0. Back
+                0. Back to Reports
                 """);
         int userChoice = Integer.parseInt(scanner.nextLine());
 
@@ -282,26 +283,30 @@ public class AccountLedgerApp {
         switch (userChoice) {
             case 1:
                 List<Transaction> monthToDateTransactions = monthToDate(transactionFileName);
+                monthToDateTransactions.sort(Comparator.comparing(Transaction :: getDateTime).reversed());
                 displayTransaction(monthToDateTransactions);
                 break;
             case 2:
                 List<Transaction> previousMonthTransactions = previousMonth(transactionFileName);
+                previousMonthTransactions.sort(Comparator.comparing(Transaction :: getDateTime).reversed());
                 displayTransaction(previousMonthTransactions);
                 break;
             case 3:
                 List<Transaction> yearToDateTransactions = yearToDate(transactionFileName);
+                yearToDateTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
                 displayTransaction(yearToDateTransactions);
                 break;
             case 4:
                 List<Transaction> previousYearTransaction = previousYear(transactionFileName);
+                previousYearTransaction.sort(Comparator.comparing(Transaction :: g));
                 displayTransaction(previousYearTransaction);
-
                 break;
             case 5:
                 List<Transaction> searchVendorTransaction = searchByVendor(transactionFileName);
                 displayTransaction(searchVendorTransaction);
                 break;
             case 0:
+                reportMenu();
                 break;
         }
 
@@ -318,6 +323,7 @@ public class AccountLedgerApp {
 
         for (Transaction transaction : transactions) {
             if (transaction.getVendor().equals(userVendorsName)) {
+
                 matchingVendors.add(transaction);
             }
         }
@@ -340,6 +346,7 @@ public class AccountLedgerApp {
             LocalDateTime dateTimeCombined = transaction.getDateTime();
 
             if ((dateTimeCombined.isEqual(firstDayOfYear) || dateTimeCombined.isAfter(firstDayOfYear)) && ((dateTimeCombined.isEqual(todayDate) || dateTimeCombined.isBefore(todayDate)))) {
+
                 yearToDate.add(transaction);
 
             }
@@ -375,13 +382,15 @@ public class AccountLedgerApp {
         List<Transaction> previousMonth = new ArrayList<>();
 
         LocalDateTime currentDate = LocalDateTime.now();
-        LocalDateTime firstDayOfMonth = currentDate.withDayOfMonth(1);
-        LocalDateTime lastDayOfTheMonth = firstDayOfMonth.minusSeconds(1);
+        LocalDateTime firstDayOfMonth = currentDate.withDayOfMonth(1).minusMonths(1);
+        LocalDateTime lastDayOfTheMonth = firstDayOfMonth.withDayOfMonth(firstDayOfMonth.getMonth().length(LocalDate.of(firstDayOfMonth.getYear(),1,1).isLeapYear()));
 
         for (Transaction transaction : transactions){
-            LocalDateTime prevMonthTransaction = transaction.getDateTime();
+            LocalDateTime prevMonthDateTime = transaction.getDateTime();
 
-            if ((prevMonthTransaction.isEqual(firstDayOfMonth) || prevMonthTransaction.isAfter(firstDayOfMonth)) && ((prevMonthTransaction.isEqual(lastDayOfTheMonth)) || prevMonthTransaction.isBefore(lastDayOfTheMonth))){
+            if ((prevMonthDateTime.isEqual(firstDayOfMonth) || prevMonthDateTime.isAfter(firstDayOfMonth)) && ((prevMonthDateTime.isEqual(lastDayOfTheMonth)) || prevMonthDateTime.isBefore(lastDayOfTheMonth))){
+
+                previousMonth.add(transaction);
             }
         }
         return previousMonth;
@@ -400,7 +409,8 @@ public class AccountLedgerApp {
 
             LocalDateTime dateTimeCombined = transaction.getDateTime();
 
-            if ((transaction.getDateTime().isEqual(firstDayOfYear) || transaction.getDateTime().isAfter(firstDayOfYear)) && (transaction.getDateTime().isEqual(lastDayOfYear)) || transaction.getDateTime().isBefore(lastDayOfYear));
+            if ((dateTimeCombined.isEqual(firstDayOfYear) || dateTimeCombined.isAfter(firstDayOfYear)) && (dateTimeCombined.isEqual(lastDayOfYear)) || dateTimeCombined.isBefore(lastDayOfYear));
+
             previousYear.add(transaction);
         }
         return previousYear;
