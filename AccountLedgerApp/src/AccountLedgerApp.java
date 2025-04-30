@@ -7,10 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class AccountLedgerApp {
 
@@ -52,10 +49,10 @@ public class AccountLedgerApp {
             // Ask the user what they'd like to do/ Give prompts
             System.out.println(""" 
                     \n------------  What would you like to do today? ------------
-                    D. Add Deposit
-                    P. Make Payment
-                    L. Display Ledger Screen
-                    X. Exit""");
+                    (D.) Add Deposit
+                    (P.) Make Payment
+                    (L.) Display Ledger Screen
+                    (X.) Exit""");
 
             // How the user makes their selection
             String userInput = scanner.nextLine().trim().toUpperCase();
@@ -75,7 +72,15 @@ public class AccountLedgerApp {
                     ledgerMenu();
                     break;
                 case "X":
-                    homeMenuRunning = false; //case running = false to get the program to stop running
+                    System.out.println("Are you sure you want to exit? (Y/N)");
+                    String userChoice = scanner.nextLine().trim().toUpperCase();
+
+                    if (userChoice.equalsIgnoreCase("Y")) {
+                        System.out.println("Thank you for using your Account Ledger Application ");
+                        homeMenuRunning = false;
+                    }    else {
+                        homeMenuRunning = true;
+                    }
                     break;
                 default:
                     System.out.println("Invalid entry. Please select from the following options: 'D','P','L','X' ");
@@ -101,7 +106,7 @@ public class AccountLedgerApp {
         System.out.println("Please provide a description: ");
         String description = scanner.nextLine().trim();
 
-        System.out.println("Your information has been deposited! ");
+        System.out.println("You deposited " + amount + " to " + vendor + " on " + ld + " at " + lt.format(timeFormatter) );
         String idOfTransaction = "D";
 
         // Call constructor out
@@ -138,26 +143,12 @@ public class AccountLedgerApp {
         System.out.println("Please provide a description: ");
         String description = scanner.nextLine().trim();
 
-        System.out.println("Your information has been deposited! ");
+        System.out.println("You made a payment of $" + String.format("%.2f", amount) + " to " + vendor + " on " + ld);
         String idOfTransaction = "P";
 
         return new Transaction(ld, lt, description, idOfTransaction, vendor, amount);
 
     }
-    //• Ledger - All entries should show the newest entries first
-    //o A) All - Display all entries
-    //o D) Deposits - Display only the entries that are deposits into the
-    //account
-    //o P) Payments - Display only the negative entries (or payments)
-    //o R) Reports - A new screen that allows the user to run pre-defined
-    //reports or to run a custom search
-    //§ 1) Month To Date
-    //§ 2) Previous Month
-    //§ 3) Year To Date
-    //§ 4) Previous Year
-    //§ 5) Search by Vendor - prompt the user for the vendor name
-    //and display all entries for that vendor
-    //§ 0) Back - go back to the report page
 
     //  Create LEDGER MENU with methods
     public static void ledgerMenu() {
@@ -175,11 +166,11 @@ public class AccountLedgerApp {
 
             System.out.println(""" 
                      \n ------------  Please select from the following options:  ------------
-                    A. Display all entries
-                    D. Deposits
-                    P. Payments
-                    R. Reports
-                    H. Home
+                    (A.) Display all entries
+                    (D.) Deposits
+                    (P.) Payments
+                    (R.) Reports
+                    (H.) Home
                     """);
 
             // How the user makes their selection
@@ -189,14 +180,17 @@ public class AccountLedgerApp {
             switch (userInputLedger) {
                 case "A":
                     List<Transaction> allTransactions = getTransactionsFromFile(transactionFileName);
+                    allTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
                     displayTransaction(allTransactions);
                     break;
                 case "D":
                     List<Transaction> depositTransactions = searchTransactionById("D", "Deposits");
+                    depositTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
                     displayTransaction(depositTransactions);
                     break;
                 case "P":
                     List<Transaction> paymentTransactions = searchTransactionById("P", "Payments");
+                    paymentTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
                     displayTransaction(paymentTransactions);
                     break;
                 case "R":
@@ -204,6 +198,7 @@ public class AccountLedgerApp {
                     break;
                 case "H":
                     ledgerMenuRunning = false;
+                    System.out.println("Returning to Home page ... ");
                     break;
                 default:
                     System.out.println("Invalid entry. Please select from the following options: 'D','P','R','H' ");
@@ -267,47 +262,54 @@ public class AccountLedgerApp {
     }
 
     public static void reportMenu() {
-        System.out.println("\n                     *****   Showing All Reports: *****      ");
-        System.out.println(""" 
-                 \n ------------  Please select from the following options:  ------------
-                1. Month To Date
-                2. Previous Month
-                3. Year To Date
-                4. Previous Year
-                5. Search by Vendor
-                0. Back to Reports
-                """);
-        int userChoice = Integer.parseInt(scanner.nextLine());
 
-        //create switch statement
-        switch (userChoice) {
-            case 1:
-                List<Transaction> monthToDateTransactions = monthToDate(transactionFileName);
-                monthToDateTransactions.sort(Comparator.comparing(Transaction :: getDateTime).reversed());
-                displayTransaction(monthToDateTransactions);
-                break;
-            case 2:
-                List<Transaction> previousMonthTransactions = previousMonth(transactionFileName);
-                previousMonthTransactions.sort(Comparator.comparing(Transaction :: getDateTime).reversed());
-                displayTransaction(previousMonthTransactions);
-                break;
-            case 3:
-                List<Transaction> yearToDateTransactions = yearToDate(transactionFileName);
-                yearToDateTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
-                displayTransaction(yearToDateTransactions);
-                break;
-            case 4:
-                List<Transaction> previousYearTransaction = previousYear(transactionFileName);
-                previousYearTransaction.sort(Comparator.comparing(Transaction :: g));
-                displayTransaction(previousYearTransaction);
-                break;
-            case 5:
-                List<Transaction> searchVendorTransaction = searchByVendor(transactionFileName);
-                displayTransaction(searchVendorTransaction);
-                break;
-            case 0:
-                reportMenu();
-                break;
+        boolean runningReportMenu = true;
+
+        while (runningReportMenu) {
+            System.out.println("\n                     *****   Showing All Reports: *****      ");
+            System.out.println(""" 
+                     \n ------------  Please select from the following options:  ------------
+                    (1.) Month To Date
+                    (2.) Previous Month
+                    (3.) Year To Date
+                    (4.) Previous Year
+                    (5.) Search by Vendor
+                    (0.) Back to Reports
+                    """);
+
+            int userChoice = Integer.parseInt(scanner.nextLine());
+
+            //create switch statement
+            switch (userChoice) {
+                case 1:
+                    List<Transaction> monthToDateTransactions = monthToDate(transactionFileName);
+                    monthToDateTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
+                    displayTransaction(monthToDateTransactions);
+                    break;
+                case 2:
+                    List<Transaction> previousMonthTransactions = previousMonth(transactionFileName);
+                    previousMonthTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
+                    displayTransaction(previousMonthTransactions);
+                    break;
+                case 3:
+                    List<Transaction> yearToDateTransactions = yearToDate(transactionFileName);
+                    yearToDateTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
+                    displayTransaction(yearToDateTransactions);
+                    break;
+                case 4:
+                    List<Transaction> previousYearTransaction = previousYear(transactionFileName);
+                    previousYearTransaction.sort(Comparator.comparing(Transaction::getDateTime).reversed());
+                    displayTransaction(previousYearTransaction);
+                    break;
+                case 5:
+                    List<Transaction> searchVendorTransaction = searchByVendor(transactionFileName);
+                    searchVendorTransaction.sort(Comparator.comparing(Transaction::getDateTime).reversed());
+                    displayTransaction(searchVendorTransaction);
+                    break;
+                case 0:
+                    runningReportMenu = false;
+                    break;
+            }
         }
 
     }
@@ -331,6 +333,7 @@ public class AccountLedgerApp {
     }
 
     public static List<Transaction> yearToDate(String fileName) {
+
         // List
         List<Transaction> transactions = getTransactionsFromFile(fileName);
         // Will create a new list year to date.
@@ -368,27 +371,27 @@ public class AccountLedgerApp {
 
             LocalDateTime transactionDate = transaction.getDateTime();
 
-            if ((transactionDate.isEqual(firstDayOfTheMonth)|| transactionDate.isAfter(firstDayOfTheMonth)) &&
-                   ((transactionDate.isEqual(todayDate)) || transactionDate.isBefore(todayDate))){
+            if ((transactionDate.isEqual(firstDayOfTheMonth) || transactionDate.isAfter(firstDayOfTheMonth)) &&
+                    ((transactionDate.isEqual(todayDate)) || transactionDate.isBefore(todayDate))) {
 
                 monthToDate.add(transaction);
             }
         }
         return monthToDate;
     }
-    public static List<Transaction> previousMonth (String fileName){
 
-        List<Transaction> transactions =getTransactionsFromFile(fileName);
+    public static List<Transaction> previousMonth(String fileName) {
+        List<Transaction> transactions = getTransactionsFromFile(fileName);
         List<Transaction> previousMonth = new ArrayList<>();
 
         LocalDateTime currentDate = LocalDateTime.now();
         LocalDateTime firstDayOfMonth = currentDate.withDayOfMonth(1).minusMonths(1);
-        LocalDateTime lastDayOfTheMonth = firstDayOfMonth.withDayOfMonth(firstDayOfMonth.getMonth().length(LocalDate.of(firstDayOfMonth.getYear(),1,1).isLeapYear()));
+        LocalDateTime lastDayOfTheMonth = firstDayOfMonth.withDayOfMonth(firstDayOfMonth.getMonth().length(LocalDate.of(firstDayOfMonth.getYear(), 1, 1).isLeapYear()));
 
-        for (Transaction transaction : transactions){
+        for (Transaction transaction : transactions) {
             LocalDateTime prevMonthDateTime = transaction.getDateTime();
 
-            if ((prevMonthDateTime.isEqual(firstDayOfMonth) || prevMonthDateTime.isAfter(firstDayOfMonth)) && ((prevMonthDateTime.isEqual(lastDayOfTheMonth)) || prevMonthDateTime.isBefore(lastDayOfTheMonth))){
+            if ((prevMonthDateTime.isEqual(firstDayOfMonth) || prevMonthDateTime.isAfter(firstDayOfMonth)) && ((prevMonthDateTime.isEqual(lastDayOfTheMonth)) || prevMonthDateTime.isBefore(lastDayOfTheMonth))) {
 
                 previousMonth.add(transaction);
             }
@@ -396,32 +399,29 @@ public class AccountLedgerApp {
         return previousMonth;
     }
 
-    public static List<Transaction> previousYear (String fileName){
+    public static List<Transaction> previousYear(String fileName) {
 
         List<Transaction> transactions = getTransactionsFromFile(fileName);
         List<Transaction> previousYear = new ArrayList<>();
 
         LocalDateTime currentDate = LocalDateTime.now();
         LocalDateTime firstDayOfYear = currentDate.minusYears(1).withDayOfYear(1);
-        LocalDateTime lastDayOfYear = LocalDateTime.of(firstDayOfYear.getYear(),12,31,23,59,59);
+        LocalDateTime lastDayOfYear = LocalDateTime.of(firstDayOfYear.getYear(), 12, 31, 23, 59, 59);
 
-        for (Transaction transaction : transactions){
+        for (Transaction transaction : transactions) {
 
             LocalDateTime dateTimeCombined = transaction.getDateTime();
 
-            if ((dateTimeCombined.isEqual(firstDayOfYear) || dateTimeCombined.isAfter(firstDayOfYear)) && (dateTimeCombined.isEqual(lastDayOfYear)) || dateTimeCombined.isBefore(lastDayOfYear));
+            if ((dateTimeCombined.isEqual(firstDayOfYear) || dateTimeCombined.isAfter(firstDayOfYear)) && (dateTimeCombined.isEqual(lastDayOfYear)) || dateTimeCombined.isBefore(lastDayOfYear)) {
 
-            previousYear.add(transaction);
+                previousYear.add(transaction);
+            }
         }
         return previousYear;
     }
 
 
 }
-
-
-
-
 
 
 
