@@ -13,18 +13,14 @@ public class AccountLedgerApp {
 
     // Import Scanner in the class using static
     static Scanner scanner = new Scanner(System.in);
-    static String transactionFileName = "src/transaction.csv"; // Name of csv file where are transactions
+    static String transactionFileName = "src/transaction.csv"; // Path to the CSV file to save/load transactions
     static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
     static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    // Where I store the methods
+
     public static void main(String[] args) {
-
         homeMenu();
-
-
     }
-
     /// //////////////////////////////////////////////////////////////////////////////////////
 
     // Create HOME MENU  method with prompts
@@ -52,8 +48,8 @@ public class AccountLedgerApp {
             switch (userInput) {
                 case "D":
                     // Writing what is in the addDeposit() to the file created
-                    Transaction newDeposit = addDeposit();
-                    writeToFile(transactionFileName, newDeposit);
+                    Transaction newDeposit = addDeposit(); // Get deposit transaction
+                    writeToFile(transactionFileName, newDeposit); // Writes the payment to the file
                     break;
                 case "P":
                     Transaction newPayment = makePayment();
@@ -81,7 +77,7 @@ public class AccountLedgerApp {
         }
     }
 
-    // addDeposit screen
+    // create deposit transaction from user input
     public static Transaction addDeposit() {
         // Create primitives after user input
 
@@ -109,14 +105,14 @@ public class AccountLedgerApp {
     // In () add the String variable, Class and object
     public static void writeToFile(String fileName, Transaction transaction) {
         // allows to add more to the file w.o losing what was inputted before
-        try (FileWriter fw = new FileWriter(fileName, true)) {
-            fw.write(transaction.toString() + "\n");
+        try (FileWriter fw = new FileWriter(fileName, true)) { //append so every transaction gets saved
+            fw.write(transaction.toString() + "\n"); // Writes transaction as a string
         } catch (IOException e) {
             System.out.println("Something went wrong " + e.getMessage()); // this is incase something goes wrong
         }
     }
 
-    // make Payment screen
+    // create a payment transaction
     public static Transaction makePayment() {
 
         LocalDate ld = LocalDate.now();
@@ -200,6 +196,7 @@ public class AccountLedgerApp {
 
     public static List<Transaction> getTransactionsFromFile(String fileName) {
         // Create a list to store all transactions from user entries
+        // Get all transaction from the CSV file and return as a list
         List<Transaction> transactions = new ArrayList<>();
 
         // Create a BufferedReader for transactions
@@ -319,7 +316,7 @@ public class AccountLedgerApp {
         // LDT to get todays date
         LocalDateTime todayDate = LocalDateTime.now();
         // Beginning of the year
-        LocalDateTime firstDayOfYear = todayDate.withDayOfYear(1);
+        LocalDateTime firstDayOfYear = todayDate.withDayOfYear(1).withHour(0).withMinute(0).withSecond(0);
 
         for (Transaction transaction : transactions) {
             // 'dtc' was created in transaction class, in trans builder by combing date & time
@@ -340,7 +337,8 @@ public class AccountLedgerApp {
         List<Transaction> monthToDate = new ArrayList<>();
 
         LocalDateTime todayDate = LocalDateTime.now();
-        LocalDateTime firstDayOfTheMonth = todayDate.withDayOfMonth(1);
+
+        LocalDateTime firstDayOfTheMonth = todayDate.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
 
         //                 one at a time       list
         for (Transaction transaction : transactions) {
@@ -349,7 +347,6 @@ public class AccountLedgerApp {
 
             if ((transactionDate.isEqual(firstDayOfTheMonth) || transactionDate.isAfter(firstDayOfTheMonth)) &&
                     ((transactionDate.isEqual(todayDate)) || transactionDate.isBefore(todayDate))) {
-
                 monthToDate.add(transaction);
             }
         }
@@ -381,14 +378,14 @@ public class AccountLedgerApp {
         List<Transaction> previousYear = new ArrayList<>();
 
         LocalDateTime currentDate = LocalDateTime.now();
-        LocalDateTime firstDayOfYear = currentDate.minusYears(1).withDayOfYear(1);
+        LocalDateTime firstDayOfYear = currentDate.minusYears(1).withDayOfYear(1).withHour(0).withMinute(0).withSecond(0);
         LocalDateTime lastDayOfYear = LocalDateTime.of(firstDayOfYear.getYear(), 12, 31, 23, 59, 59);
 
         for (Transaction transaction : transactions) {
 
             LocalDateTime dateTimeCombined = transaction.getDateTime();
 
-            if ((dateTimeCombined.isEqual(firstDayOfYear) || dateTimeCombined.isAfter(firstDayOfYear)) && (dateTimeCombined.isEqual(lastDayOfYear)) || dateTimeCombined.isBefore(lastDayOfYear)) {
+            if ((dateTimeCombined.isEqual(firstDayOfYear) || dateTimeCombined.isAfter(firstDayOfYear)) && ((dateTimeCombined.isEqual(lastDayOfYear)) || dateTimeCombined.isBefore(lastDayOfYear))) {
 
                 previousYear.add(transaction);
             }
