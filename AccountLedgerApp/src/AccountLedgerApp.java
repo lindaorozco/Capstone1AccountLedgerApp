@@ -282,29 +282,19 @@ public class AccountLedgerApp {
             //create switch statement
             switch (userChoice) {
                 case 1:
-                    List<Transaction> monthToDateTransactions = monthToDate(transactionFileName);
-                    monthToDateTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
-                    displayTransaction(monthToDateTransactions);
+                    monthToDate(transactionFileName);
                     break;
                 case 2:
-                    List<Transaction> previousMonthTransactions = previousMonth(transactionFileName);
-                    previousMonthTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
-                    displayTransaction(previousMonthTransactions);
+                    previousMonth(transactionFileName);
                     break;
                 case 3:
-                    List<Transaction> yearToDateTransactions = yearToDate(transactionFileName);
-                    yearToDateTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
-                    displayTransaction(yearToDateTransactions);
+                    yearToDate(transactionFileName);
                     break;
                 case 4:
-                    List<Transaction> previousYearTransaction = previousYear(transactionFileName);
-                    previousYearTransaction.sort(Comparator.comparing(Transaction::getDateTime).reversed());
-                    displayTransaction(previousYearTransaction);
+                    previousYear(transactionFileName);
                     break;
                 case 5:
-                    List<Transaction> searchVendorTransaction = searchByVendor(transactionFileName);
-                    searchVendorTransaction.sort(Comparator.comparing(Transaction::getDateTime).reversed());
-                    displayTransaction(searchVendorTransaction);
+                    searchByVendor(transactionFileName);
                     break;
                 case 0:
                     runningReportMenu = false;
@@ -314,7 +304,7 @@ public class AccountLedgerApp {
 
     }
 
-    public static List<Transaction> searchByVendor(String fileName) {
+    public static void searchByVendor(String fileName) {
         // all trans list
         List<Transaction> transactions = getTransactionsFromFile(fileName);
         // new list containing only the matching vendor info of transactions
@@ -324,15 +314,15 @@ public class AccountLedgerApp {
         String userVendorsName = scanner.nextLine();
 
         for (Transaction transaction : transactions) {
-            if (transaction.getVendor().equals(userVendorsName)) {
+            if (transaction.getVendor().equalsIgnoreCase(userVendorsName)) {
 
                 matchingVendors.add(transaction);
             }
         }
-        return matchingVendors;
+        sortingDateTime(matchingVendors);
     }
 
-    public static List<Transaction> yearToDate(String fileName) {
+    public static void yearToDate(String fileName) {
 
         // List
         List<Transaction> transactions = getTransactionsFromFile(fileName);
@@ -351,13 +341,12 @@ public class AccountLedgerApp {
             if ((dateTimeCombined.isEqual(firstDayOfYear) || dateTimeCombined.isAfter(firstDayOfYear)) && ((dateTimeCombined.isEqual(todayDate) || dateTimeCombined.isBefore(todayDate)))) {
 
                 yearToDate.add(transaction);
-
             }
         }
-        return yearToDate;
+        sortingDateTime(yearToDate);
     }
 
-    public static List<Transaction> monthToDate(String fileName) {
+    public static void monthToDate(String fileName) {
         // Old list
         List<Transaction> transactions = getTransactionsFromFile(fileName);
         // new list
@@ -366,9 +355,9 @@ public class AccountLedgerApp {
         LocalDateTime todayDate = LocalDateTime.now();
         LocalDateTime firstDayOfTheMonth = todayDate.withDayOfMonth(1);
 
-        // create loop
+        //                 one at a time       list
         for (Transaction transaction : transactions) {
-
+            // Call out variable transaction and loop through every transaction
             LocalDateTime transactionDate = transaction.getDateTime();
 
             if ((transactionDate.isEqual(firstDayOfTheMonth) || transactionDate.isAfter(firstDayOfTheMonth)) &&
@@ -377,10 +366,10 @@ public class AccountLedgerApp {
                 monthToDate.add(transaction);
             }
         }
-        return monthToDate;
+        sortingDateTime(monthToDate);
     }
 
-    public static List<Transaction> previousMonth(String fileName) {
+    public static void previousMonth(String fileName) {
         List<Transaction> transactions = getTransactionsFromFile(fileName);
         List<Transaction> previousMonth = new ArrayList<>();
 
@@ -396,10 +385,10 @@ public class AccountLedgerApp {
                 previousMonth.add(transaction);
             }
         }
-        return previousMonth;
+        sortingDateTime(previousMonth);
     }
 
-    public static List<Transaction> previousYear(String fileName) {
+    public static void previousYear(String fileName) {
 
         List<Transaction> transactions = getTransactionsFromFile(fileName);
         List<Transaction> previousYear = new ArrayList<>();
@@ -417,7 +406,12 @@ public class AccountLedgerApp {
                 previousYear.add(transaction);
             }
         }
-        return previousYear;
+       sortingDateTime(previousYear);
+    }
+    public static void sortingDateTime (List<Transaction> unsortedDateTimeList){
+
+        unsortedDateTimeList.sort(Comparator.comparing(Transaction::getDateTime).reversed());
+        displayTransaction(unsortedDateTimeList);
     }
 
 
