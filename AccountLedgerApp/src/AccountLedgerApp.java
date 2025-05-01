@@ -27,15 +27,6 @@ public class AccountLedgerApp {
 
     /// //////////////////////////////////////////////////////////////////////////////////////
 
-    //The home screen should give the user the following options.  The
-    //application should continue to run until the user chooses to exit.
-    //§ D) Add Deposit - prompt user for the deposit information and
-    //save it to the csv file
-    //§ P) Make Payment (Debit) - prompt user for the debit
-    //information and save it to the csv file
-    //§ L) Ledger - display the ledger screen
-    //§ X) Exit - exit the application
-
     // Create HOME MENU  method with prompts
     public static void homeMenu() {
         // Welcome the user
@@ -122,10 +113,7 @@ public class AccountLedgerApp {
             fw.write(transaction.toString() + "\n");
         } catch (IOException e) {
             System.out.println("Something went wrong " + e.getMessage()); // this is incase something goes wrong
-
         }
-
-
     }
 
     // make Payment screen
@@ -225,7 +213,6 @@ public class AccountLedgerApp {
                 // Start adding into transactions list
                 transactions.add(transaction);
             }
-
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
