@@ -21,7 +21,21 @@ This is a simple Java console application that acts as a **personal finance ledg
     -   Previous year
         
     -   Search by vendor
-        
+
+<details> 
+<summary> 📁 Screenshots </summary>
+
+### Home Menu:
+   ![alt text](/pictures/homeMenu.png)
+### Ledger Menu:
+   ![alt text](/pictures/ledgerMenu.png)
+### Report Menu:
+   ![alt text](/pictures/reportMenu.png)
+
+</details>
+
+
+
 
 ----------
 
