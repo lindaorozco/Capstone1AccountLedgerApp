@@ -164,18 +164,15 @@ public class AccountLedgerApp {
             switch (userInputLedger) {
                 case "A":
                     List<Transaction> allTransactions = getTransactionsFromFile(transactionFileName);
-                    allTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
-                    displayTransaction(allTransactions);
+                    sortingDateTime(allTransactions);
                     break;
                 case "D":
                     List<Transaction> depositTransactions = searchTransactionById("D", "Deposits");
-                    depositTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
-                    displayTransaction(depositTransactions);
+                    sortingDateTime(depositTransactions);
                     break;
                 case "P":
                     List<Transaction> paymentTransactions = searchTransactionById("P", "Payments");
-                    paymentTransactions.sort(Comparator.comparing(Transaction::getDateTime).reversed());
-                    displayTransaction(paymentTransactions);
+                    sortingDateTime(paymentTransactions);
                     break;
                 case "R":
                     reportMenu();
@@ -186,7 +183,6 @@ public class AccountLedgerApp {
                     break;
                 default:
                     System.out.println("Invalid entry. Please select from the following options: 'D','P','R','H' ");
-
 
             }
 
@@ -262,7 +258,6 @@ public class AccountLedgerApp {
                     """);
 
             int userChoice = Integer.parseInt(scanner.nextLine());
-
             //create switch statement
             switch (userChoice) {
                 case 1:
@@ -392,6 +387,7 @@ public class AccountLedgerApp {
         }
        sortingDateTime(previousYear);
     }
+
     public static void sortingDateTime (List<Transaction> unsortedDateTimeList){
 
         unsortedDateTimeList.sort(Comparator.comparing(Transaction::getDateTime).reversed());
