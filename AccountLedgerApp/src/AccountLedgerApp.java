@@ -150,10 +150,10 @@ public class AccountLedgerApp {
 
             System.out.println(""" 
                      \n ------------  Please select from the following options:  ------------
-                    (A.) Display all entries
-                    (D.) Deposits
-                    (P.) Payments
-                    (R.) Reports
+                    (A.) Display all transactions
+                    (D.) Deposit transactions
+                    (P.) Payment transactions
+                    (R.) Reports Menu
                     (H.) Home
                     """);
 
